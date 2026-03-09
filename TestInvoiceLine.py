@@ -75,52 +75,23 @@ class TestInvoiceLine(unittest.TestCase):
         self.assertEqual(self.line.kilos_to_bill(), Decimal("6.0"))
         
     
+    def test_unit_price_without_modifiers_returns_base_price(self):
+        self.line.add_partial_billing(PriceAdjustmentBillItem(1, Decimal('0'), Decimal('2'), Decimal('1'), ":)", self.line))
+        self.assertEqual(self.line.unit_price(), Decimal("2.25"))
+    
+    def test_unit_price_with_delta(self):
+        self.line.add_partial_billing(PriceAdjustmentBillItem(1, Decimal('1'), Decimal('2'), Decimal('0.7'), ":)", self.line))
+        self.line.add_partial_billing(PriceAdjustmentBillItem(2, Decimal('1.5'), Decimal('2'), Decimal('1'), ":(", self.line))
+        self.assertEqual(self.line.unit_price(), Decimal("4.75")) # 2.25 + 1 + 1.5 = 4.75
         
+    
+
 
     
     
         
         
           
-        
-    
-
-
-
-
-
-
-    # ==========================================
-    # 3. LÓGICA DE NEGOCIO: kilos_to_bill()
-    # ==========================================
-    #def test_kilos_to_bill_without_modifiers_returns_base_qty(self):
-    #    """
-    #    Objetivo: Si no hay facturas parciales ni notas de crédito, 
-    #    kilos_to_bill() debe ser igual a qtyKg.
-    #    """
-    #    pass
-#
-    #def test_kilos_to_bill_subtracts_partial_billings(self):
-    #    """
-    #    Objetivo: Añadir uno o varios PartialBilling y comprobar que 
-    #    kilos_to_bill() resta esos kilos de la cantidad base.
-    #    """
-    #    pass
-#
-    #def test_kilos_to_bill_applies_credit_note_deltas(self):
-    #    """
-    #    Objetivo: Añadir un CreditNoteBillItem (con un delta negativo o positivo) 
-    #    y verificar que kilos_to_bill() refleja esa suma/resta.
-    #    """
-    #    pass
-#
-    #def test_kilos_to_bill_is_clamped_at_zero(self):
-    #    """
-    #    Objetivo: CASO LÍMITE. Si los PartialBilling suman más kilos que el 
-    #    qtyKg base, kilos_to_bill() debe devolver 0, no un número negativo.
-    #    """
-    #    pass
-
     # ==========================================
     # 4. LÓGICA DE NEGOCIO: unit_price()
     # ==========================================
