@@ -84,41 +84,32 @@ class TestInvoiceLine(unittest.TestCase):
         self.line.add_partial_billing(PriceAdjustmentBillItem(2, Decimal('1.5'), Decimal('2'), Decimal('1'), ":(", self.line))
         self.assertEqual(self.line.unit_price(), Decimal("4.75")) # 2.25 + 1 + 1.5 = 4.75
         
-    
+    def test_lineAmount_calculates_correctly_with_mixed_modifiers(self):
+        self.line.add_partial_billing(PartialBilling(Decimal("2.0"))) 
+        CreditNoteBillItem(seq=1, typeDeltaKg=Decimal("-1.0"), reason="Devolución", target=self.line)
 
+        PriceAdjustmentBillItem(
+            seq=1, 
+            deltaUnitPriceEURPerKg=Decimal("0.50"), 
+            qtyBasis=Decimal("10"), 
+            deltaTotal=Decimal("5"), 
+            reason="Recargo", 
+            target=self.line
+        )
+        
+       
+        # Kilos: 10.5 (base) - 2.0 (parcial) - 1.0 (crédito) = 7.5 kg
+        # Precio: 2.25 (base) + 0.50 (ajuste) = 2.75 €/kg
+        # Total: 7.5 * 2.75 = 20.625
+        
+        expected_kilos = Decimal("7.5")
+        expected_price = Decimal("2.75")
+        expected_total = Decimal("20.625")
 
-    
-    
+        self.assertEqual(self.line.kilos_to_bill(), expected_kilos)
+        self.assertEqual(self.line.unit_price(), expected_price)
         
-        
-          
-    # ==========================================
-    # 4. LÓGICA DE NEGOCIO: unit_price()
-    # ==========================================
-   # def test_unit_price_without_modifiers_returns_base_price(self):
-   #     """
-   #     Objetivo: Si no hay ajustes de precio, unit_price() debe 
-   #     devolver el unitPriceEURPerKg original.
-   #     """
-   #     pass
-#
-   # def test_unit_price_applies_price_adjustments(self):
-   #     """
-   #     Objetivo: Añadir varios PriceAdjustmentBillItem con diferentes deltas 
-   #     y verificar que unit_price() devuelve la suma correcta (base + deltas).
-   #     """
-   #     pass
-#
-   # # ==========================================
-   # # 5. LÓGICA DE NEGOCIO: lineAmount (Propiedad)
-   # # ==========================================
-   # def test_lineAmount_calculates_correctly_with_mixed_modifiers(self):
-   #     """
-   #     Objetivo: TEST DE INTEGRACIÓN. Crear una línea, añadirle un PartialBilling, 
-   #     una nota de crédito y un ajuste de precio. Verificar que lineAmount es 
-   #     exactamente el resultado de kilos_to_bill() * unit_price().
-   #     """
-   #     pass
+        self.assertEqual(self.line.lineAmount, expected_total)
 
 if __name__ == '__main__':
     unittest.main()
