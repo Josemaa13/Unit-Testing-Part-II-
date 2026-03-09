@@ -76,12 +76,12 @@ class TestInvoiceLine(unittest.TestCase):
         
     
     def test_unit_price_without_modifiers_returns_base_price(self):
-        self.line.add_partial_billing(PriceAdjustmentBillItem(1, Decimal('0'), Decimal('2'), Decimal('1'), ":)", self.line))
+        self.line.add_price_adjustment_item(PriceAdjustmentBillItem(1, Decimal('0'), Decimal('2'), Decimal('1'), ":)", self.line))
         self.assertEqual(self.line.unit_price(), Decimal("2.25"))
     
     def test_unit_price_with_delta(self):
-        self.line.add_partial_billing(PriceAdjustmentBillItem(1, Decimal('1'), Decimal('2'), Decimal('0.7'), ":)", self.line))
-        self.line.add_partial_billing(PriceAdjustmentBillItem(2, Decimal('1.5'), Decimal('2'), Decimal('1'), ":(", self.line))
+        self.line.add_price_adjustment_item(PriceAdjustmentBillItem(1, Decimal('1'), Decimal('2'), Decimal('0.7'), ":)", self.line))
+        self.line.add_price_adjustment_item(PriceAdjustmentBillItem(2, Decimal('1.5'), Decimal('2'), Decimal('1'), ":(", self.line))
         self.assertEqual(self.line.unit_price(), Decimal("4.75")) # 2.25 + 1 + 1.5 = 4.75
         
     def test_lineAmount_calculates_correctly_with_mixed_modifiers(self):
