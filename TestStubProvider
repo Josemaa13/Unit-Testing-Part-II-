@@ -1,0 +1,44 @@
+import unittest
+from decimal import Decimal
+from datetime import date
+from UnitTesting2 import Invoice, Provider
+
+
+class InvoiceStub(Invoice):
+    def __init__(self, kilos, price, total_amount):
+        
+        super().__init__(number="STUB", date=date.today(), currency="EUR")
+        
+        self._kilos = Decimal(str(kilos))
+        self._price = Decimal(str(price))
+        self._total = Decimal(str(total_amount))
+
+    def kilos_to_bill(self):
+        return self._kilos
+
+    def unit_price(self):
+        return self._price
+
+    @property
+    def total(self):
+        return self._total
+
+
+class TestProvider(unittest.TestCase):
+    def test_provider_aggregations_with_stubs(self):
+
+        provider = Provider(name="Test Provider")
+        
+
+        inv1 = InvoiceStub(kilos="10", price="2.0", total_amount="20.0")
+        provider.add_bill(inv1)
+        
+        inv2 = InvoiceStub(kilos="10", price="4.0", total_amount="40.0")
+        provider.add_bill(inv2)
+        
+  
+        self.assertEqual(provider.total_kilos_to_bill(), Decimal("20.0"))
+        
+        self.assertEqual(provider.avg_unit_price(), Decimal("3.0"))
+        
+        self.assertEqual(provider.total_invoice_amount(), Decimal("60.0"))
